@@ -27,6 +27,9 @@ const asTransaction = r => ({ id: r.id, recipientName: r.recipient_name, upiId: 
 export function createApp(db, { provider = getPaymentProvider() } = {}) {
   const app = express();
   app.disable('x-powered-by');
+  // Vercel's proxy supplies X-Forwarded-For; trust its first proxy hop so
+  // express-rate-limit can key requests correctly in serverless deployments.
+  app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(express.json({ limit: '16kb', strict: true }));
   app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-7', legacyHeaders: false }));
