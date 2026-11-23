@@ -4,6 +4,10 @@ async function request(path, options = {}) {
     headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
   });
   if (response.status === 204) return null;
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    throw new Error('The payment service is temporarily unavailable. Refresh the page and try again.');
+  }
   const data = await response.json();
   if (!response.ok) throw new Error(data?.error?.message || 'Please try again.');
   return data;
